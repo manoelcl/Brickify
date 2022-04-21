@@ -9,12 +9,12 @@ const argv = require("minimist")(process.argv.slice(2));
 let tilesNumber = 25;
 let outputResolution = 1000;
 
-const input = path.resolve(__dirname, "img.jpg");
-let tile = path.resolve(__dirname, "tile.jpg");
+const input = path.resolve(__dirname, "img.png");
+let tile = path.resolve(__dirname, "img/tile.jpg");
 
 const create = async () => {
   await sharp(tile)
-    .resize({ width: outputResolution / tilesNumber })
+    .resize({ width: Math.floor(outputResolution / tilesNumber) })
     .toBuffer()
     .then((data) => {
       tile = data;
@@ -25,7 +25,10 @@ const create = async () => {
     .toBuffer()
     .then((data) => {
       sharp(data)
-        .resize({ width: outputResolution, kernel: sharp.kernel.nearest })
+        .resize({
+          width: Math.floor(outputResolution / tilesNumber) * tilesNumber,
+          kernel: sharp.kernel.nearest,
+        })
         .composite([
           {
             input: tile,
@@ -37,4 +40,5 @@ const create = async () => {
         .toFile("output.png");
     });
 };
+
 create();
